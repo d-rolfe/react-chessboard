@@ -18,16 +18,19 @@ export class ChessBoard extends React.Component {
           };
 
         let board = [];
-        let i, j;
-        for (i = 0; i < 8; i++) {
+        for (let i = 0; i < 8; i++) {
             let row = []
-            for (j = 0; j < 8; j++) {
+            for (let j = 0; j < 8; j++) {
+                let cellId = i + j + 1;
                 row.push(
-                    <td style={cellStyle} onMouseDown={() => this.onMouseDown(i, j)} onMouseUp={() => this.onMouseUp(i, j)}>{this.props.G.board[i][j]}</td>
+                    <td key={cellId} style={cellStyle} onMouseDown={() => this.onMouseDown(i, j)} onMouseUp={() => this.onMouseUp(i, j)}>
+                        {this.props.G.board[i][j]}
+                    </td>
                 )
             }
+            let rowId = i + 1;
             board.push(
-                <tr>{row}</tr>
+                <tr key={rowId}>{row}</tr>
             )
         }
 
