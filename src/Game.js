@@ -34,10 +34,6 @@ export const ChessGame = {
         selectedPiece: null,
     }),
 
-    turn: {
-        moveLimit: 1,
-    },
-
     endIf: (G, ctx) => {
         if (IsVictory(G.board)) {
             return { winner: ctx.currentPlayer };
@@ -58,23 +54,39 @@ export const ChessGame = {
             let attackingPiece = G.board[yStart][xStart];
             let defendingPiece = G.board[yEnd][xEnd];
 
-            if (isValidMove(G.board, attackingPiece, defendingPiece, yStart, xStart, yEnd, xEnd)) {
+            if (isValidMove(ctx.currentPlayer, G.board, attackingPiece, defendingPiece, yStart, xStart, yEnd, xEnd)) {
                 // update board
                 G.board[yStart][xStart] = null;
                 G.board[yEnd][xEnd] = attackingPiece;
+                G.selectedPiece = null;
+                ctx.events.endTurn();
             }
             else {
                 // disallow move
-                console.log("invalid move");
-                // return INVALID_MOVE;
+                G.selectedPiece = null;
+                return INVALID_MOVE;
             }
-            G.selectedPiece = null;
         }
     }
 }
 
 // helper functions
-var isValidMove = (board, attackingPiece, defendingPiece, yStart, xStart, yEnd, xEnd) => {
+var isValidMove = (currentPlayer, board, attackingPiece, defendingPiece, yStart, xStart, yEnd, xEnd) => {
+    // White moves first, so white = player 0, black = player 1
+    // ensure only can move players own pieces
+    if ( (currentPlayer === "0" ) && ( "prnbqk".indexOf(attackingPiece) !== -1 ) ) {
+        return false;
+    }
+    if ( (currentPlayer === "1" ) && ( "PRNBQK".indexOf(attackingPiece) !== -1 ) ) {
+        return false;
+    }
+    // ensure only can attack other players pieces
+    if ( (currentPlayer === "0" ) && ( "PRNBQK".indexOf(defendingPiece) !== -1 ) ) {
+        return false;
+    }
+    if ( (currentPlayer === "1" ) && ( "prnbqk".indexOf(defendingPiece) !== -1 ) ) {
+        return false;
+    }
     switch(attackingPiece) {
         case "P":
             if (xStart == xEnd && yStart - 1 == yEnd && defendingPiece == null) {
