@@ -24,7 +24,7 @@ export class ChessBoard extends React.Component {
                 let cellId = i + j + 1;
                 row.push(
                     <td key={cellId} style={cellStyle} onMouseDown={() => this.onMouseDown(i, j)} onMouseUp={() => this.onMouseUp(i, j)}>
-                        {this.props.G.board[i][j]}
+                        <span>{this.props.G.board[i][j]}</span>
                     </td>
                 )
             }
@@ -39,6 +39,10 @@ export class ChessBoard extends React.Component {
                 <table>
                     <tbody>{board}</tbody>
                 </table>
+                <p>{'Using fromCharCode (decimal): ' + String.fromCharCode(9812) }</p>
+                <p>{'Using fromCharCode (hex): ' + String.fromCharCode(0x2654) }</p>
+                <p>{'Using fromCodePoint (decimal): ' + String.fromCharCode(9812) }</p>
+                <p>{'Using fromCodePoint (hex): ' + String.fromCharCode(0x2654) }</p>
             </div>
         )
     }
