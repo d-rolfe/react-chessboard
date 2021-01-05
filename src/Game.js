@@ -21,28 +21,14 @@ export const ChessGame = {
 
     setup: () => ({ 
         board: [
-            ["r", "n", "b", "q", "k", "b", "n", "r"],
-            ["p", "p", "p", "p", "p", "p", "p", "p"],
-            [null, null, null, null, null, null, null, null],
-            [null, null, null, null, null, null, null, null],
-            [null, null, null, null, null, null, null, null],
-            [null, null, null, null, null, null, null, null],
-            ["P", "P", "P", "P", "P", "P", "P", "P"],
-            ["R", "N", "B", "Q", "K", "B", "N", "R"],
-        ],
-        // board2: [
-        //     [JSON.parse(JSON.stringify(whitePawn))],
-        //     [whitePawn, whitePawn]
-        // ],
-        board2: [
             [blackRook, blackKnight, blackBishop, blackQueen, blackKing, blackBishop, blackKnight, blackRook],
             [blackPawn, blackPawn, blackPawn, blackPawn, blackPawn, blackPawn, blackPawn, blackPawn],
             [null, null, null, null, null, null, null, null],
             [null, null, null, null, null, null, null, null],
             [null, null, null, null, null, null, null, null],
             [null, null, null, null, null, null, null, null],
-            [whiteRook, whiteKnight, whiteBishop, whiteQueen, whiteKing, whiteBishop, whiteKnight, whiteRook],
             [whitePawn, whitePawn, whitePawn, whitePawn, whitePawn, whitePawn, whitePawn, whitePawn],
+            [whiteRook, whiteKnight, whiteBishop, whiteQueen, whiteKing, whiteBishop, whiteKnight, whiteRook],
         ],
         selectedPiece: null,
     }),
@@ -91,6 +77,90 @@ export const ChessGame = {
 
 // helper functions
 var isValidMove = (currentPlayer, board, attackingPiece, defendingPiece, yStart, xStart, yEnd, xEnd) => {
+    // White moves first, so white = player 0, black = player 1
+    // ensure only can move players own pieces
+    if ( (currentPlayer === "0" ) && ( attackingPiece !== null && attackingPiece.team === "black" ) ) {
+        console.log("can't move other players pieces!!");
+        return false;
+    }
+    if ( (currentPlayer === "1" ) && ( attackingPiece !== null && attackingPiece.team === "white" ) ) {
+        console.log("can't move other players pieces!!");
+        return false;
+    }
+    // ensure only can attack other players pieces
+    if ( (currentPlayer === "0" ) && ( defendingPiece !== null && defendingPiece.team === "white" ) ) {
+        console.log("can't friendly fire");
+        return false;
+    }
+    if ( (currentPlayer === "1" ) && ( defendingPiece !== null && defendingPiece.team === "black" ) ) {
+        console.log("can't friendly fire");
+        return false;
+    }
+    if (attackingPiece === null) {
+        console.log("attacking piece is null!!!")
+        return false;
+    }
+
+    switch(attackingPiece.type) {
+        case "pawn":
+            if (attackingPiece.team === "white") {
+                if (xStart === xEnd && yStart - 1 === yEnd && defendingPiece === null) {
+                    return true;  // white pawn moves up 1
+                }
+                else if ( (xStart === xEnd ) && ( yStart - 2 === yEnd ) && ( defendingPiece === null ) && ( yStart === 6) ) {
+                    return true;  // white pawn moves up 2
+                }
+                else if ((xStart + 1 === xEnd || xStart - 1 === xEnd) && (yStart - 1 === yEnd) && (defendingPiece !== null)) {
+                    return true; // white pawn attacks 
+                }
+                else {
+                    console.log("Pawn attempts invalid move");
+                    return false;  // invalid move
+                }
+            }
+            else if (attackingPiece.team === "black") {
+                if ( (xStart === xEnd ) && ( yStart + 1 === yEnd ) && ( defendingPiece === null )) {
+                    return true;  // black pawn moves down 1
+                }
+                else if ( (xStart === xEnd ) && ( yStart + 2 === yEnd ) && ( defendingPiece === null ) && ( yStart === 1) ) {
+                    return true;  // black pawn moves down 2
+                }
+                else if ((xStart + 1 === xEnd || xStart - 1 === xEnd) && (yStart + 1 === yEnd) && (defendingPiece !== null)) {
+                    return true; // black pawn attacks 
+                }
+                else {
+                    console.log("Pawn attempts invalid move");
+                    return false;  // invalid move
+                }
+            }
+            else {
+                console.log("Should never reach here");
+                return false;  // should never reach here
+            }
+        case "rook":
+            if ( (yStart === yEnd) && (xStart !== xEnd) && (pathIsClearAlongRow(board, yStart, xStart, xEnd)) ) {
+                return true;
+            }
+            else if ( (xStart === xEnd) && (yStart !== yEnd) && (pathIsClearAlongColumn(board, xStart, yStart, yEnd)) ) {
+                return true;
+            }
+            else {
+                return false;
+            }
+        // case "B" || "b":
+        //     let possibleMoves = []
+        //     if ( ( [yEnd, xEnd] in possibleMoves ) && ( pathIsClearAlongDiagonal(board, yStart, xStart, yEnd, xEnd)) ) {
+        //         return true
+        //     }
+        //     else {
+        //         return false
+        //     }
+        default:
+            console.log("Default case chosen");
+            return false
+    }
+}
+var isValidMove2 = (currentPlayer, board, attackingPiece, defendingPiece, yStart, xStart, yEnd, xEnd) => {
     // White moves first, so white = player 0, black = player 1
     // ensure only can move players own pieces
     if ( (currentPlayer === "0" ) && ( "prnbqk".indexOf(attackingPiece) !== -1 ) ) {
@@ -186,10 +256,10 @@ var IsVictory = (board) => {
     for (i = 0; i < board.length; i++) {
         let row = board[i];
         for (j = 0; j< row.length; j++) {
-            if (board[i][j] === "K") {
+            if (board[i][j] !== null && board[i][j].type === "king" && board[i][j].team === "white") {
                 seenWhiteKing = true;
             }
-            if (board[i][j] === "k") {
+            if (board[i][j] !== null && board[i][j].type === "king" && board[i][j].team === "black") {
                 seenBlackKing = true;
             }
         }

@@ -24,7 +24,9 @@ export class ChessBoard extends React.Component {
                 let cellId = i + j + 1;
                 row.push(
                     <td key={cellId} style={cellStyle} onMouseDown={() => this.onMouseDown(i, j)} onMouseUp={() => this.onMouseUp(i, j)}>
-                        <span>{this.props.G.board[i][j]}</span>
+                        <span>
+                            {this.props.G.board[i][j] !== null && String.fromCharCode(this.props.G.board[i][j].iconCharCode)}
+                        </span>
                     </td>
                 )
             }
