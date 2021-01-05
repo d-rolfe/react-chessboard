@@ -139,10 +139,10 @@ var isValidMove = (currentPlayer, board, attackingPiece, defendingPiece, yStart,
             }
         case "rook":
             if ( (yStart === yEnd) && (xStart !== xEnd) && (pathIsClearAlongRow(board, yStart, xStart, xEnd)) ) {
-                return true;
+                return true; // horizontal movement
             }
             else if ( (xStart === xEnd) && (yStart !== yEnd) && (pathIsClearAlongColumn(board, xStart, yStart, yEnd)) ) {
-                return true;
+                return true; // vertical movement
             }
             else {
                 return false;
@@ -160,89 +160,43 @@ var isValidMove = (currentPlayer, board, attackingPiece, defendingPiece, yStart,
             return false
     }
 }
-var isValidMove2 = (currentPlayer, board, attackingPiece, defendingPiece, yStart, xStart, yEnd, xEnd) => {
-    // White moves first, so white = player 0, black = player 1
-    // ensure only can move players own pieces
-    if ( (currentPlayer === "0" ) && ( "prnbqk".indexOf(attackingPiece) !== -1 ) ) {
-        return false;
-    }
-    if ( (currentPlayer === "1" ) && ( "PRNBQK".indexOf(attackingPiece) !== -1 ) ) {
-        return false;
-    }
-    // ensure only can attack other players pieces
-    if ( (currentPlayer === "0" ) && ( "PRNBQK".indexOf(defendingPiece) !== -1 ) ) {
-        return false;
-    }
-    if ( (currentPlayer === "1" ) && ( "prnbqk".indexOf(defendingPiece) !== -1 ) ) {
-        return false;
-    }
-    switch(attackingPiece) {
-        case "P":
-            if (xStart === xEnd && yStart - 1 === yEnd && defendingPiece === null) {
-                return true;  // white pawn moves up 1
-            }
-            else if ( (xStart === xEnd ) && ( yStart - 2 === yEnd ) && ( defendingPiece === null ) && ( yStart === 6) ) {
-                return true;  // white pawn moves up 2
-            }
-            else if ((xStart + 1 === xEnd || xStart - 1 === xEnd) && (yStart - 1 === yEnd) && (defendingPiece !== null)) {
-                return true // white pawn attacks 
-            }
-            else {
-                return false  // invalid move
-            }
-        case "p":
-            if ( (xStart === xEnd ) && ( yStart + 1 === yEnd ) && ( defendingPiece === null )) {
-                return true;  // black pawn moves down 1
-            }
-            else if ( (xStart === xEnd ) && ( yStart + 2 === yEnd ) && ( defendingPiece === null ) && ( yStart === 1) ) {
-                return true;  // black pawn moves down 2
-            }
-            else if ((xStart + 1 === xEnd || xStart - 1 === xEnd) && (yStart + 1 === yEnd) && (defendingPiece !== null)) {
-                return true // black pawn attacks 
-            }
-            else {
-                return false  // invalid move
-            }
-        case "R" || "r":
-            if ( (yStart === yEnd) && (xStart !== xEnd) && (pathIsClearAlongRow(board, yStart, xStart, xEnd)) ) {
-                return true
-            }
-            else if ( (xStart === xEnd) && (yStart !== yEnd) && (pathIsClearAlongColumn(board, xStart, yStart, yEnd)) ) {
-                return true
-            }
-            else {
-                return false
-            }
-        // case "B" || "b":
-        //     let possibleMoves = []
-        //     if ( ( [yEnd, xEnd] in possibleMoves ) && ( pathIsClearAlongDiagonal(board, yStart, xStart, yEnd, xEnd)) ) {
-        //         return true
-        //     }
-        //     else {
-        //         return false
-        //     }
-        default:
-            return false
-    }
-}
 
 var pathIsClearAlongRow = (board, rowNum, xStart, xEnd) => {
-    let i;
-    for (i = xStart + 1; i < xEnd; i++) {
-        let square = board[rowNum][i]
-        if (square !== null) {
-            return false
+    if (xStart < xEnd) {  // moving right
+        for (let i = xStart + 1; i < xEnd; i++) {
+            let square = board[rowNum][i]
+            if (square !== null) {
+                return false
+            }
         }
     }
+    else {  // moving left
+        for (let i = xStart - 1; i > xEnd; i--) {
+            let square = board[rowNum][i]
+            if (square !== null) {
+                return false
+            }
+        }
+    }
+    
     return true;
 }
 
 var pathIsClearAlongColumn = (board, colNum, yStart, yEnd) => {
-    let i;
-    for (i = yStart + 1; i < yEnd; i++) {
-        let square = board[colNum][i]
-        if (square !== null) {
-            return false
+    if (yStart < yEnd) {  // moving down
+        for (let i = yStart + 1; i < yEnd; i++) {
+            let square = board[i][colNum]
+            if (square !== null) {
+                return false
+            }
+        }
+    }
+    else {  // moving up
+        for (let i = yStart - 1; i > yEnd; i--) {
+            let square = board[i][colNum]
+            if (square !== null) {
+                return false
+            }
         }
     }
     return true;
