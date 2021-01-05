@@ -2,6 +2,20 @@
 // import App from './App';
 import { Client } from 'boardgame.io/client';
 import { ChessGame } from './Game';
+import { 
+  whitePawn,
+  whiteRook,
+  whiteKnight,
+  whiteBishop,
+  whiteQueen,
+  whiteKing,
+  blackPawn,
+  blackRook,
+  blackKnight,
+  blackBishop,
+  blackQueen,
+  blackKing,
+} from './ChessPiece';
 
 
 // test('renders learn react link', () => {
@@ -23,14 +37,14 @@ it('test White pawn moves up 1 space', () => {
   const {G, ctx} = client.store.getState();
 
   expect(G.board).toEqual([
-    ["r", "n", "b", "q", "k", "b", "n", "r"],
-    ["p", "p", "p", "p", "p", "p", "p", "p"],
+    [blackRook, blackKnight, blackBishop, blackQueen, blackKing, blackBishop, blackKnight, blackRook],
+    [blackPawn, blackPawn, blackPawn, blackPawn, blackPawn, blackPawn, blackPawn, blackPawn],
     [null, null, null, null, null, null, null, null],
     [null, null, null, null, null, null, null, null],
     [null, null, null, null, null, null, null, null],
-    ["P", null, null, null, null, null, null, null],
-    [null, "P", "P", "P", "P", "P", "P", "P"],
-    ["R", "N", "B", "Q", "K", "B", "N", "R"],
+    [whitePawn, null, null, null, null, null, null, null],
+    [null, whitePawn, whitePawn, whitePawn, whitePawn, whitePawn, whitePawn, whitePawn],
+    [whiteRook, whiteKnight, whiteBishop, whiteQueen, whiteKing, whiteBishop, whiteKnight, whiteRook],
   ]);
 });
 
@@ -40,14 +54,14 @@ it('test White pawn attacks', () => {
     // if you want to override default setup, do it here
     setup: () => ({ 
       board: [
-          ["r", "n", "b", "q", "k", "b", "n", "r"],
-          ["p", null, "p", "p", "p", "p", "p", "p"],
-          [null, null, null, null, null, null, null, null],
-          [null, "p", null, null, null, null, null, null],
-          ["P", null, null, null, null, null, null, null],
-          [null, null, null, null, null, null, null, null],
-          [null, "P", "P", "P", "P", "P", "P", "P"],
-          ["R", "N", "B", "Q", "K", "B", "N", "R"],
+            [blackRook, blackKnight, blackBishop, blackQueen, blackKing, blackBishop, blackKnight, blackRook],
+            [blackPawn, null, blackPawn, blackPawn, blackPawn, blackPawn, blackPawn, blackPawn],
+            [null, null, null, null, null, null, null, null],
+            [null, blackPawn, null, null, null, null, null, null],
+            [whitePawn, null, null, null, null, null, null, null],
+            [null, null, null, null, null, null, null, null],
+            [null, whitePawn, whitePawn, whitePawn, whitePawn, whitePawn, whitePawn, whitePawn],
+            [whiteRook, whiteKnight, whiteBishop, whiteQueen, whiteKing, whiteBishop, whiteKnight, whiteRook],
         ]
     }),
   };
@@ -59,14 +73,14 @@ it('test White pawn attacks', () => {
   const {G, ctx} = client.store.getState();
 
   expect(G.board).toEqual([
-    ["r", "n", "b", "q", "k", "b", "n", "r"],
-    ["p", null, "p", "p", "p", "p", "p", "p"],
+    [blackRook, blackKnight, blackBishop, blackQueen, blackKing, blackBishop, blackKnight, blackRook],
+    [blackPawn, null, blackPawn, blackPawn, blackPawn, blackPawn, blackPawn, blackPawn],
     [null, null, null, null, null, null, null, null],
-    [null, "P", null, null, null, null, null, null],
+    [null, whitePawn, null, null, null, null, null, null],
     [null, null, null, null, null, null, null, null],
     [null, null, null, null, null, null, null, null],
-    [null, "P", "P", "P", "P", "P", "P", "P"],
-    ["R", "N", "B", "Q", "K", "B", "N", "R"],
+    [null, whitePawn, whitePawn, whitePawn, whitePawn, whitePawn, whitePawn, whitePawn],
+    [whiteRook, whiteKnight, whiteBishop, whiteQueen, whiteKing, whiteBishop, whiteKnight, whiteRook],
   ]);
 });
 
@@ -76,14 +90,14 @@ it('test White rook moves horizontally', () => {
     // if you want to override default setup, do it here
     setup: () => ({ 
       board: [
-          ["r", "n", "b", "q", "k", "b", "n", "r"],
-          ["p", null, "p", "p", "p", "p", "p", "p"],
-          [null, null, null, null, null, null, null, null],
-          [null, "p", null, null, null, null, null, null],
-          ["P", null, null, null, null, null, null, null],
-          ["R", null, null, null, null, null, null, null],
-          [null, "P", "P", "P", "P", "P", "P", "P"],
-          [null, "N", "B", "Q", "K", "B", "N", "R"],
+            [blackRook, blackKnight, blackBishop, blackQueen, blackKing, blackBishop, blackKnight, blackRook],
+            [blackPawn, blackPawn, blackPawn, blackPawn, blackPawn, blackPawn, blackPawn, blackPawn],
+            [null, null, null, null, null, null, null, null],
+            [null, null, null, null, null, null, null, null],
+            [whitePawn, null, null, null, null, null, null, null],
+            [whiteRook, null, null, null, null, null, null, null],
+            [null, whitePawn, whitePawn, whitePawn, whitePawn, whitePawn, whitePawn, whitePawn],
+            [null, whiteKnight, whiteBishop, whiteQueen, whiteKing, whiteBishop, whiteKnight, whiteRook],
         ]
     }),
   };
@@ -95,14 +109,14 @@ it('test White rook moves horizontally', () => {
   const {G, ctx} = client.store.getState();
 
   expect(G.board).toEqual([
-    ["r", "n", "b", "q", "k", "b", "n", "r"],
-    ["p", null, "p", "p", "p", "p", "p", "p"],
+    [blackRook, blackKnight, blackBishop, blackQueen, blackKing, blackBishop, blackKnight, blackRook],
+    [blackPawn, blackPawn, blackPawn, blackPawn, blackPawn, blackPawn, blackPawn, blackPawn],
     [null, null, null, null, null, null, null, null],
-    [null, "p", null, null, null, null, null, null],
-    ["P", null, null, null, null, null, null, null],
-    [null, null, null, null, null, null, "R", null],
-    [null, "P", "P", "P", "P", "P", "P", "P"],
-    [null, "N", "B", "Q", "K", "B", "N", "R"],
+    [null, null, null, null, null, null, null, null],
+    [whitePawn, null, null, null, null, null, null, null],
+    [null, null, null, null, null, null, whiteRook, null],
+    [null, whitePawn, whitePawn, whitePawn, whitePawn, whitePawn, whitePawn, whitePawn],
+    [null, whiteKnight, whiteBishop, whiteQueen, whiteKing, whiteBishop, whiteKnight, whiteRook],
   ]);
 });
 
@@ -112,14 +126,14 @@ it('test White rook does not move horizontally because pawn in the way', () => {
     // if you want to override default setup, do it here
     setup: () => ({ 
       board: [
-          ["r", "n", "b", "q", "k", "b", "n", "r"],
-          ["p", null, "p", "p", "p", "p", "p", "p"],
-          [null, null, null, null, null, null, null, null],
-          [null, null, null, null, null, null, null, null],
-          ["P", null, null, null, null, null, null, null],
-          ["R", null, null, "p", null, null, null, null],
-          [null, "P", "P", "P", "P", "P", "P", "P"],
-          [null, "N", "B", "Q", "K", "B", "N", "R"],
+            [blackRook, blackKnight, blackBishop, blackQueen, blackKing, blackBishop, blackKnight, blackRook],
+            [blackPawn, blackPawn, blackPawn, blackPawn, blackPawn, blackPawn, blackPawn, blackPawn],
+            [null, null, null, null, null, null, null, null],
+            [null, null, null, null, null, null, null, null],
+            [null, null, null, null, null, null, null, null],
+            [whiteRook, null, null, whitePawn, null, null, null, null],
+            [whitePawn, whitePawn, whitePawn, null, whitePawn, whitePawn, whitePawn, whitePawn],
+            [null, whiteKnight, whiteBishop, whiteQueen, whiteKing, whiteBishop, whiteKnight, whiteRook],
         ]
     }),
   };
@@ -131,13 +145,13 @@ it('test White rook does not move horizontally because pawn in the way', () => {
   const {G, ctx} = client.store.getState();
 
   expect(G.board).toEqual([
-    ["r", "n", "b", "q", "k", "b", "n", "r"],
-    ["p", null, "p", "p", "p", "p", "p", "p"],
+    [blackRook, blackKnight, blackBishop, blackQueen, blackKing, blackBishop, blackKnight, blackRook],
+    [blackPawn, blackPawn, blackPawn, blackPawn, blackPawn, blackPawn, blackPawn, blackPawn],
     [null, null, null, null, null, null, null, null],
     [null, null, null, null, null, null, null, null],
-    ["P", null, null, null, null, null, null, null],
-    ["R", null, null, "p", null, null, null, null],
-    [null, "P", "P", "P", "P", "P", "P", "P"],
-    [null, "N", "B", "Q", "K", "B", "N", "R"],
+    [null, null, null, null, null, null, null, null],
+    [whiteRook, null, null, whitePawn, null, null, null, null],
+    [whitePawn, whitePawn, whitePawn, null, whitePawn, whitePawn, whitePawn, whitePawn],
+    [null, whiteKnight, whiteBishop, whiteQueen, whiteKing, whiteBishop, whiteKnight, whiteRook],
   ]);
 });

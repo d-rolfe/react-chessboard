@@ -1,6 +1,7 @@
 import React from 'react';
 
 export class ChessBoard extends React.Component {
+    
     onMouseDown(row, col) {
         this.props.moves.selectPieceToMove(row, col);
     }
@@ -8,6 +9,7 @@ export class ChessBoard extends React.Component {
     onMouseUp(row, col) {
         this.props.moves.movePiece(row, col);
     }
+
     render() {
         const cellStyle = {
             border: '1px solid #555',
@@ -24,7 +26,7 @@ export class ChessBoard extends React.Component {
                 let cellId = i + j + 1;
                 row.push(
                     <td key={cellId} style={cellStyle} onMouseDown={() => this.onMouseDown(i, j)} onMouseUp={() => this.onMouseUp(i, j)}>
-                        <span>
+                        <span className="noselect">
                             {this.props.G.board[i][j] !== null && String.fromCharCode(this.props.G.board[i][j].iconCharCode)}
                         </span>
                     </td>
