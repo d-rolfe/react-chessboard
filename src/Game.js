@@ -155,10 +155,33 @@ var isValidMove = (currentPlayer, board, attackingPiece, defendingPiece, yStart,
                 return false;
             }
         case "knight":
-            let possibleMoves = generatePossibleKnightMoves(yStart, xStart)
+            let possibleKnightMoves = generatePossibleKnightMoves(yStart, xStart)
             console.log('knight moves: ');
-            console.log(possibleMoves);
-            for (let move of possibleMoves) {
+            console.log(possibleKnightMoves);
+            for (let move of possibleKnightMoves) {
+                if (yEnd === move[0] && xEnd === move[1]) {
+                    return true;
+                }
+            }
+            return false;
+        case "queen":
+            if (pathIsValidDiagonal(board, yStart, xStart, yEnd, xEnd) && pathIsClearAlongDiagonal(board, yStart, xStart, yEnd, xEnd)) {
+                return true;
+            }
+            else if ( (yStart === yEnd) && (xStart !== xEnd) && (pathIsClearAlongRow(board, yStart, xStart, xEnd)) ) {
+                return true; // horizontal movement
+            }
+            else if ( (xStart === xEnd) && (yStart !== yEnd) && (pathIsClearAlongColumn(board, xStart, yStart, yEnd)) ) {
+                return true; // vertical movement
+            }
+            else {
+                return false;
+            }
+        case "king":
+            let possibleKingMoves = generatePossibleKingMoves(yStart, xStart)
+            console.log('king moves: ');
+            console.log(possibleKingMoves);
+            for (let move of possibleKingMoves) {
                 if (yEnd === move[0] && xEnd === move[1]) {
                     return true;
                 }
@@ -168,6 +191,23 @@ var isValidMove = (currentPlayer, board, attackingPiece, defendingPiece, yStart,
             console.log("Default case chosen");
             return false
     }
+}
+
+var generatePossibleKingMoves = (y, x) => {
+    const moves = [
+        [y - 1, x - 1],
+        [y - 1, x],
+        [y - 1, x + 1],
+        [y, x - 1],
+        [y, x + 1],
+        [y + 1, x - 1],
+        [y + 1, x],
+        [y + 1, x + 1]
+    ];
+
+    const result = moves.filter(coord => (coord[0] < 8 && coord[1] < 8 && coord[0] >= 0 && coord[1] >= 0))
+
+    return result;
 }
 
 var generatePossibleKnightMoves = (y, x) => {
