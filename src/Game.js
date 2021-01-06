@@ -147,17 +147,182 @@ var isValidMove = (currentPlayer, board, attackingPiece, defendingPiece, yStart,
             else {
                 return false;
             }
-        // case "B" || "b":
-        //     let possibleMoves = []
-        //     if ( ( [yEnd, xEnd] in possibleMoves ) && ( pathIsClearAlongDiagonal(board, yStart, xStart, yEnd, xEnd)) ) {
-        //         return true
-        //     }
-        //     else {
-        //         return false
-        //     }
+        case "bishop":
+            if ( pathIsValidDiagonal(board, yStart, xStart, yEnd, xEnd) && pathIsClearAlongDiagonal(board, yStart, xStart, yEnd, xEnd) ) {
+                return true;
+            }
+            else {
+                return false;
+            }
+        case "knight":
+            let possibleMoves = generatePossibleKnightMoves(yStart, xStart)
+            console.log('knight moves: ');
+            console.log(possibleMoves);
+            for (let move of possibleMoves) {
+                if (yEnd === move[0] && xEnd === move[1]) {
+                    return true;
+                }
+            }
+            return false;
         default:
             console.log("Default case chosen");
             return false
+    }
+}
+
+var generatePossibleKnightMoves = (y, x) => {
+    const moves = [
+        [y - 2, x - 1], [y - 2, x + 1],
+        [y - 1, x + 2], [y + 1, x + 2],
+        [y + 2, x + 1], [y + 2, x - 1],
+        [y + 1, x - 2], [y - 1, x - 2]
+    ];
+
+    const result = moves.filter(coord => (coord[0] < 8 && coord[1] < 8 && coord[0] >= 0 && coord[1] >= 0))
+
+    return result;
+}
+
+var pathIsValidDiagonal = (board, yStart, xStart, yEnd, xEnd) => {
+    if (yStart < yEnd && xStart < xEnd) {
+        // down-right movement
+        let i = yStart; 
+        let j = xStart;
+        while (i < yEnd && j < xEnd) {
+            i++;
+            j++;
+        }
+        if (i === yEnd && j === xEnd) {
+            return true;
+        }
+        else {
+            return false;
+        }
+    }
+    else if (yStart < yEnd && xStart > xEnd) {
+        // down-left movement
+        let i = yStart; 
+        let j = xStart;
+        while (i < yEnd && j > xEnd) {
+            i++;
+            j--;
+        }
+        if (i === yEnd && j === xEnd) {
+            return true;
+        }
+        else {
+            return false;
+        }
+    }
+    else if (yStart > yEnd && xStart < xEnd) {
+        // up-right movement
+        let i = yStart; 
+        let j = xStart;
+        while (i > yEnd && j < xEnd) {
+            i--;
+            j++;
+        }
+        if (i === yEnd && j === xEnd) {
+            return true;
+        }
+        else {
+            return false;
+        }
+    }
+    else if (yStart > yEnd && xStart > xEnd) {
+        // up-left movement
+        let i = yStart; 
+        let j = xStart;
+        while (i > yEnd && j > xEnd) {
+            i--;
+            j--;
+        }
+        if (i === yEnd && j === xEnd) {
+            return true;
+        }
+        else {
+            return false;
+        }
+    }
+    return false;
+}
+
+// can probably combine this method with pathIsValidDiagonal
+var pathIsClearAlongDiagonal = (board, yStart, xStart, yEnd, xEnd) => {
+    if (yStart < yEnd && xStart < xEnd) {
+        // down-right movement
+        let i = yStart + 1; 
+        let j = xStart + 1;
+        while (i < yEnd && j < xEnd) {
+            if (board[i][j] !== null) {
+                return false;
+            }
+            i++;
+            j++;
+        }
+        if (i === yEnd && j === xEnd) {
+            return true;
+        }
+        else {
+            return false;
+        }
+    }
+    else if (yStart < yEnd && xStart > xEnd) {
+        // down-left movement
+        let i = yStart + 1; 
+        let j = xStart - 1;
+        while (i < yEnd && j > xEnd) {
+            if (board[i][j] !== null) {
+                return false;
+            }
+            i++;
+            j--;
+        }
+        if (i === yEnd && j === xEnd) {
+            return true;
+        }
+        else {
+            return false;
+        }
+    }
+    else if (yStart > yEnd && xStart < xEnd) {
+        // up-right movement
+        let i = yStart - 1; 
+        let j = xStart + 1;
+        while (i > yEnd && j < xEnd) {
+            if (board[i][j] !== null) {
+                return false;
+            }
+            i--;
+            j++;
+        }
+        if (i === yEnd && j === xEnd) {
+            return true;
+        }
+        else {
+            return false;
+        }
+    }
+    else if (yStart > yEnd && xStart > xEnd) {
+        // up-left movement
+        let i = yStart - 1; 
+        let j = xStart - 1;
+        while (i > yEnd && j > xEnd) {
+            if (board[i][j] !== null) {
+                return false;
+            }
+            i--;
+            j--;
+        }
+        if (i === yEnd && j === xEnd) {
+            return true;
+        }
+        else {
+            return false;
+        }
+    }
+    else {
+        return false; // should never reach here
     }
 }
 
