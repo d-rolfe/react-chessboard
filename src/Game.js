@@ -78,14 +78,18 @@ export const ChessGame = {
                 }
                 futureBoard[yStart][xStart] = null;
                 futureBoard[yEnd][xEnd] = attackingPiece;
-                let checkState = computeCheck(G, ctx, futureBoard);
+                let checkState = computeCheck(futureBoard);
+                console.log('checkstate: ');
+                console.log(checkState);
     
-                if (ctx.currentPlayer === "0" && checkState.whiteKingIsInCheck) {
+                if (ctx.currentPlayer === "0" && checkState.whiteKingIsInCheck === true) {
                     // white put themself in check
+                    console.log('invalid move: white attempted to put themself in check')
                     return INVALID_MOVE;
                 }
-                else if (ctx.currentPlayer === "1" && checkState.blackKingIsInCheck) {
+                else if (ctx.currentPlayer === "1" && checkState.blackKingIsInCheck === true) {
                     // black put themself in check
+                    console.log('invalid move: black attempted to put themself in check')
                     return INVALID_MOVE;
                 }
                 else {
@@ -128,15 +132,30 @@ var computeCheckMate = (G) => {
     return null;
 }
 
-var computeCheck = (G, ctx, futureBoard) => {
+var computeCheck = (futureBoard) => {
     // returns object with booleans for if either king is in check
+    let yWhiteKing, xWhiteKing, yBlackKing, xBlackKing;
+    for (let i = 0; i < futureBoard.length; i++) {
+        let row = futureBoard[i];
+        for (let j = 0; j < row.length; j++) {
+            let piece = futureBoard[i][j];
+            if (piece !== null && piece.team === "white" && piece.type === "king") {
+                yWhiteKing = i;
+                xWhiteKing = j;
+            }
+            if (piece !== null && piece.team === "black" && piece.type === "king") {
+                yBlackKing = i;
+                xBlackKing = j;
+            }
+        }
+    }
     return {
-        whiteKingIsInCheck: isKingInCheck(futureBoard, ctx, "black", G.whiteKingPosition[0], G.whiteKingPosition[1]),
-        blackKingIsInCheck: isKingInCheck(futureBoard, ctx, "white", G.blackKingPosition[0], G.blackKingPosition[1]),
+        whiteKingIsInCheck: isKingInCheck(futureBoard, "black", yWhiteKing, xWhiteKing),
+        blackKingIsInCheck: isKingInCheck(futureBoard, "white", yBlackKing, xBlackKing),
     };
 }
 
-var isKingInCheck = (board, ctx, attackingTeam, yKing, xKing) => {
+var isKingInCheck = (board, attackingTeam, yKing, xKing) => {
     let currentPlayer;
     if (attackingTeam === "white") {
         currentPlayer = "0";
@@ -165,20 +184,20 @@ var isValidMove = (currentPlayer, board, attackingPiece, defendingPiece, yStart,
     // White moves first, so white = player 0, black = player 1
     // ensure only can move players own pieces
     if ( (currentPlayer === "0" ) && ( attackingPiece !== null && attackingPiece.team === "black" ) ) {
-        // console.log("can't move other players pieces!!");
+        console.log("can't move other players pieces!!");
         return false;
     }
     if ( (currentPlayer === "1" ) && ( attackingPiece !== null && attackingPiece.team === "white" ) ) {
-        // console.log("can't move other players pieces!!");
+        console.log("can't move other players pieces!!");
         return false;
     }
     // ensure only can attack other players pieces
     if ( (currentPlayer === "0" ) && ( defendingPiece !== null && defendingPiece.team === "white" ) ) {
-        // console.log("can't friendly fire");
+        console.log("can't friendly fire");
         return false;
     }
     if ( (currentPlayer === "1" ) && ( defendingPiece !== null && defendingPiece.team === "black" ) ) {
-        // console.log("can't friendly fire");
+        console.log("can't friendly fire");
         return false;
     }
     if (attackingPiece === null) {
