@@ -1,7 +1,7 @@
 import React from 'react';
 
 export class ChessBoard extends React.Component {
-    
+
     onMouseDown(row, col) {
         this.props.moves.selectPieceToMove(row, col);
     }
@@ -40,6 +40,8 @@ export class ChessBoard extends React.Component {
 
         return (
             <div>
+                <p>{ this.props.G.isCheck.whiteKingIsInCheck && 'White king is in check'}</p>
+                <p>{ this.props.G.isCheck.blackKingIsInCheck && 'Black king is in check'}</p>
                 <table>
                     <tbody>{board}</tbody>
                 </table>

@@ -30,12 +30,20 @@ export const ChessGame = {
             [whitePawn, whitePawn, whitePawn, whitePawn, whitePawn, whitePawn, whitePawn, whitePawn],
             [whiteRook, whiteKnight, whiteBishop, whiteQueen, whiteKing, whiteBishop, whiteKnight, whiteRook],
         ],
+        whiteKingPosition: [7, 4],
+        blackKingPosition: [0, 4],
         selectedPiece: null,
+        isCheck: {
+            whiteKingIsInCheck: false,
+            blackKingIsInCheck: false,
+        },
+        isCheckMate: null,
     }),
 
     endIf: (G, ctx) => {
-        if (IsVictory(G.board)) {
-            return { winner: ctx.currentPlayer };
+
+        if (G.isCheckMate) {
+            return { winner: ctx.currentPlayer }
         }
     },
 
@@ -58,12 +66,51 @@ export const ChessGame = {
             let xStart = G.selectedPiece.col;
             let attackingPiece = G.board[yStart][xStart];
             let defendingPiece = G.board[yEnd][xEnd];
+            let validMove = isValidMove(ctx.currentPlayer, G.board, attackingPiece, defendingPiece, yStart, xStart, yEnd, xEnd);
 
-            if (isValidMove(ctx.currentPlayer, G.board, attackingPiece, defendingPiece, yStart, xStart, yEnd, xEnd)) {
+            // put lines 68 to 95 inside if below
+
+            if (validMove) {
+                // need to construct board state IF move was performed
+                let futureBoard = []
+                for (let i = 0; i < G.board.length; i++) {
+                    futureBoard[i] = G.board[i].slice();
+                }
+                futureBoard[yStart][xStart] = null;
+                futureBoard[yEnd][xEnd] = attackingPiece;
+                let checkState = computeCheck(G, ctx, futureBoard);
+    
+                if (ctx.currentPlayer === "0" && checkState.whiteKingIsInCheck) {
+                    // white put themself in check
+                    return INVALID_MOVE;
+                }
+                else if (ctx.currentPlayer === "1" && checkState.blackKingIsInCheck) {
+                    // black put themself in check
+                    return INVALID_MOVE;
+                }
+                else {
+                    G.isCheck = checkState;
+                }
+
                 // update board
                 G.board[yStart][xStart] = null;
                 G.board[yEnd][xEnd] = attackingPiece;
                 G.selectedPiece = null;
+                // if king moved, update position in state
+                if (attackingPiece.type === "king") {
+                    if (ctx.currentPlayer === "0") {
+                        G.whiteKingPosition = [yEnd, xEnd];
+                    }
+                    else {
+                        G.blackKingPosition = [yEnd, xEnd];
+                    }
+                }
+
+                // check for checkmate
+                if (G.isCheck) {
+                    G.isCheckMate = computeCheckMate(G);
+                }
+
                 ctx.events.endTurn();
             }
             else {
@@ -76,24 +123,62 @@ export const ChessGame = {
 }
 
 // helper functions
+
+var computeCheckMate = (G) => {
+    return null;
+}
+
+var computeCheck = (G, ctx, futureBoard) => {
+    // returns object with booleans for if either king is in check
+    return {
+        whiteKingIsInCheck: isKingInCheck(futureBoard, ctx, "black", G.whiteKingPosition[0], G.whiteKingPosition[1]),
+        blackKingIsInCheck: isKingInCheck(futureBoard, ctx, "white", G.blackKingPosition[0], G.blackKingPosition[1]),
+    };
+}
+
+var isKingInCheck = (board, ctx, attackingTeam, yKing, xKing) => {
+    let currentPlayer;
+    if (attackingTeam === "white") {
+        currentPlayer = "0";
+    }
+    else {
+        currentPlayer = "1";
+    }
+    for (let i = 0; i < board.length; i++) {
+        let row = board[i];
+        for (let j = 0; j < row.length; j++) {
+            let piece = board[i][j];
+            if (piece !== null && piece.team === attackingTeam) {
+                let pieceCanAttackKing = isValidMove(currentPlayer, board, piece, board[yKing][xKing], i, j, yKing, xKing);
+                if (pieceCanAttackKing) {
+                    console.log('some king is in check from ' + piece.team + ' ' + piece.type);
+                    return true;
+                }
+            }
+        }
+    }
+    return false;
+}
+
+// returns true if the attackingPiece is moved correctly, false otherwise
 var isValidMove = (currentPlayer, board, attackingPiece, defendingPiece, yStart, xStart, yEnd, xEnd) => {
     // White moves first, so white = player 0, black = player 1
     // ensure only can move players own pieces
     if ( (currentPlayer === "0" ) && ( attackingPiece !== null && attackingPiece.team === "black" ) ) {
-        console.log("can't move other players pieces!!");
+        // console.log("can't move other players pieces!!");
         return false;
     }
     if ( (currentPlayer === "1" ) && ( attackingPiece !== null && attackingPiece.team === "white" ) ) {
-        console.log("can't move other players pieces!!");
+        // console.log("can't move other players pieces!!");
         return false;
     }
     // ensure only can attack other players pieces
     if ( (currentPlayer === "0" ) && ( defendingPiece !== null && defendingPiece.team === "white" ) ) {
-        console.log("can't friendly fire");
+        // console.log("can't friendly fire");
         return false;
     }
     if ( (currentPlayer === "1" ) && ( defendingPiece !== null && defendingPiece.team === "black" ) ) {
-        console.log("can't friendly fire");
+        // console.log("can't friendly fire");
         return false;
     }
     if (attackingPiece === null) {
@@ -114,7 +199,7 @@ var isValidMove = (currentPlayer, board, attackingPiece, defendingPiece, yStart,
                     return true; // white pawn attacks 
                 }
                 else {
-                    console.log("Pawn attempts invalid move");
+                    // console.log("Pawn attempts invalid move");
                     return false;  // invalid move
                 }
             }
@@ -129,7 +214,7 @@ var isValidMove = (currentPlayer, board, attackingPiece, defendingPiece, yStart,
                     return true; // black pawn attacks 
                 }
                 else {
-                    console.log("Pawn attempts invalid move");
+                    // console.log("Pawn attempts invalid move");
                     return false;  // invalid move
                 }
             }
@@ -156,8 +241,6 @@ var isValidMove = (currentPlayer, board, attackingPiece, defendingPiece, yStart,
             }
         case "knight":
             let possibleKnightMoves = generatePossibleKnightMoves(yStart, xStart)
-            console.log('knight moves: ');
-            console.log(possibleKnightMoves);
             for (let move of possibleKnightMoves) {
                 if (yEnd === move[0] && xEnd === move[1]) {
                     return true;
@@ -179,8 +262,14 @@ var isValidMove = (currentPlayer, board, attackingPiece, defendingPiece, yStart,
             }
         case "king":
             let possibleKingMoves = generatePossibleKingMoves(yStart, xStart)
-            console.log('king moves: ');
-            console.log(possibleKingMoves);
+            // check if any of these put king in check
+
+            // possibleKingMoves = possibleKingMoves.filter(position => atleastOneEnemyCanAttackPosition(board, position));
+
+            // if (possibleKingMoves.length < 1) {
+            //     // checkmate
+            // }
+            
             for (let move of possibleKingMoves) {
                 if (yEnd === move[0] && xEnd === move[1]) {
                     return true;
@@ -407,29 +496,30 @@ var pathIsClearAlongColumn = (board, colNum, yStart, yEnd) => {
     return true;
 }
 
+
 // TODO: better implementation might be to record pieces held 'hostage' and iterate through that to check if king has been captured.
-var IsVictory = (board) => {
-    let i, j;
-    let seenWhiteKing = false;
-    let seenBlackKing = false;
-    for (i = 0; i < board.length; i++) {
-        let row = board[i];
-        for (j = 0; j< row.length; j++) {
-            if (board[i][j] !== null && board[i][j].type === "king" && board[i][j].team === "white") {
-                seenWhiteKing = true;
-            }
-            if (board[i][j] !== null && board[i][j].type === "king" && board[i][j].team === "black") {
-                seenBlackKing = true;
-            }
-        }
-    }
-    if (seenWhiteKing && seenBlackKing) {
-        return false;
-    }
-    else if (seenWhiteKing && !seenBlackKing) {
-        return true;
-    }
-    else if (!seenWhiteKing && seenBlackKing) {
-        return true;
-    }
-}
+// var IsVictory = (board) => {
+//     let i, j;
+//     let seenWhiteKing = false;
+//     let seenBlackKing = false;
+//     for (i = 0; i < board.length; i++) {
+//         let row = board[i];
+//         for (j = 0; j< row.length; j++) {
+//             if (board[i][j] !== null && board[i][j].type === "king" && board[i][j].team === "white") {
+//                 seenWhiteKing = true;
+//             }
+//             if (board[i][j] !== null && board[i][j].type === "king" && board[i][j].team === "black") {
+//                 seenBlackKing = true;
+//             }
+//         }
+//     }
+//     if (seenWhiteKing && seenBlackKing) {
+//         return false;
+//     }
+//     else if (seenWhiteKing && !seenBlackKing) {
+//         return true;
+//     }
+//     else if (!seenWhiteKing && seenBlackKing) {
+//         return true;
+//     }
+// }
