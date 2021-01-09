@@ -42,7 +42,7 @@ export const ChessGame = {
 
     endIf: (G, ctx) => {
 
-        if (G.isCheckMate) {
+        if (G.isCheckMate === true) {
             return { winner: ctx.currentPlayer }
         }
     },
@@ -111,7 +111,7 @@ export const ChessGame = {
                 }
 
                 // check for checkmate
-                if (G.isCheck) {
+                if (G.isCheck.whiteKingIsInCheck === true || G.isCheck.blackKingIsInCheck === true) {
                     G.isCheckMate = computeCheckMate(G);
                 }
 
@@ -128,8 +128,85 @@ export const ChessGame = {
 
 // helper functions
 
+var getPossibleMoves = (piece, y, x, board) => {
+    switch(piece) {
+        case "pawn":
+            return generatePossiblePawnMoves(piece, board, y, x);
+        case "knight":
+            return generatePossibleKnightMoves(y, x);
+        case "bishop":
+            return generatePossibleBishopMoves(y, x);
+        case "rook":
+            return generatePossibleRookMoves(y, x);
+        case "queen":
+            return generatePossibleQueenMoves(y, x);
+        case "king":
+            return generatePossibleKingMoves(y, x);
+        default:
+            console.log("Default case chosen");
+            return [];
+    }
+}
+
 var computeCheckMate = (G) => {
-    return null;
+    if (G.isCheck.whiteKingIsInCheck === true) {
+        // can white make any move to get out of check?
+        for (let i = 0; i < G.board; i++) {
+            let row = G.board[i];
+            for (let j = 0; j < row.length; j++) {
+                let piece = row[j];
+                if (piece !== null &&  piece.team === "white") {
+                    let possibleMoves = getPossibleMoves(piece, i, j, G.board)
+                    for (let move of possibleMoves) {
+                        // create futureBoard with new move
+                        if (isValidMove("0", G.board, piece, G.board[move[0]][move[1]], i, j, move[0], move[1])) {
+                            let futureBoard = []
+                            for (let k = 0; k < G.board.length; k++) {
+                                futureBoard[k] = G.board[k].slice();
+                            }
+                            futureBoard[i][j] = null;
+                            futureBoard[move[0]][move[1]] = piece;
+    
+                            let checkState = computeCheck(futureBoard);
+                            if (checkState.whiteKingIsInCheck === false) {
+                                return false; // no checkmate in this futureBoard state
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        return true;
+    }
+    else if (G.isCheck.blackKingIsInCheck === true) {
+        // can black make any move to get out of check?
+        for (let i = 0; i < G.board; i++) {
+            let row = G.board[i];
+            for (let j = 0; j < row.length; j++) {
+                let piece = row[j];
+                if (piece !== null &&  piece.team === "black") {
+                    let possibleMoves = getPossibleMoves(piece, i, j, G.board)
+                    for (let move of possibleMoves) {
+                        // create futureBoard with new move
+                        if (isValidMove("1", G.board, piece, G.board[move[0]][move[1]], i, j, move[0], move[1])) {
+                            let futureBoard = []
+                            for (let k = 0; k < G.board.length; k++) {
+                                futureBoard[k] = G.board[k].slice();
+                            }
+                            futureBoard[i][j] = null;
+                            futureBoard[move[0]][move[1]] = piece;
+    
+                            let checkState = computeCheck(futureBoard);
+                            if (checkState.blackKingIsInCheck === false) {
+                                return false; // no checkmate in this futureBoard state
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        return true;
+    }
 }
 
 var computeCheck = (futureBoard) => {
@@ -157,11 +234,14 @@ var computeCheck = (futureBoard) => {
 
 var isKingInCheck = (board, attackingTeam, yKing, xKing) => {
     let currentPlayer;
+    let defendingKing;
     if (attackingTeam === "white") {
         currentPlayer = "0";
+        defendingKing = "black";
     }
     else {
         currentPlayer = "1";
+        defendingKing = "white";
     }
     for (let i = 0; i < board.length; i++) {
         let row = board[i];
@@ -170,7 +250,7 @@ var isKingInCheck = (board, attackingTeam, yKing, xKing) => {
             if (piece !== null && piece.team === attackingTeam) {
                 let pieceCanAttackKing = isValidMove(currentPlayer, board, piece, board[yKing][xKing], i, j, yKing, xKing);
                 if (pieceCanAttackKing) {
-                    console.log('some king is in check from ' + piece.team + ' ' + piece.type);
+                    console.log(defendingKing + ' king is in check from ' + piece.team + ' ' + piece.type);
                     return true;
                 }
             }
@@ -316,6 +396,77 @@ var generatePossibleKingMoves = (y, x) => {
     const result = moves.filter(coord => (coord[0] < 8 && coord[1] < 8 && coord[0] >= 0 && coord[1] >= 0))
 
     return result;
+}
+
+var generatePossiblePawnMoves = (piece, board, y, x) => {
+    let moves = [];
+    if (piece.team === "white") {
+        if (y === "6" && board[y - 2][x] === null) moves.push([y - 2, x]);
+        if (board[y - 1][x] === null) moves.push([y - 1, x]);
+        if (board[y - 1][x - 1] !== null && board[y - 1][x - 1].team !== piece.team) moves.push([y - 1, x - 1]);
+        if (board[y - 1][x + 1] !== null && board[y - 1][x + 1].team !== piece.team) moves.push([y - 1, x + 1]);
+    }
+    else if (piece.team === "black") {
+        if (y === "1" && board[y + 2][x] === null) moves.push([y + 2, x]);
+        if (board[y + 1][x] === null) moves.push([y + 1, x]);
+        if (board[y + 1][x - 1] !== null && board[y + 1][x - 1].team !== piece.team) moves.push([y + 1, x - 1]);
+        if (board[y + 1][x + 1] !== null && board[y + 1][x + 1].team !== piece.team) moves.push([y + 1, x + 1]);
+    }
+
+    return moves.filter(coord => (coord[0] < 8 && coord[1] < 8 && coord[0] >= 0 && coord[1] >= 0))
+}
+
+var generatePossibleRookMoves = (y, x) => {
+    let moves = [];
+    for (let i = 0; i < 8; i++) {
+        moves.push([i][x]);
+    }
+    for (let j = 0; j < 8; j++) {
+        moves.push([y][j]);
+    }
+    return moves.filter(coord => (coord[0] < 8 && coord[1] < 8 && coord[0] >= 0 && coord[1] >= 0))
+}
+
+var generatePossibleBishopMoves = (y, x) => {
+    let moves = [];
+
+    let i = y; 
+    let j = x;
+    while (i < 8 && j < 8) { // down-right 
+        moves.push([i][j]);
+        i++;
+        j++;
+    }
+
+    i = y;
+    j = x;
+    while (i >= 0 && j < 8) { // up-right
+        moves.push([i][j]);
+        i--;
+        j++;
+    }
+
+    i = y;
+    j = x;
+    while (i < 8 && j >= 0) { // down-left
+        moves.push([i][j]);
+        i++;
+        j--;
+    }
+
+    i = y;
+    j = x;
+    while (i >= 0 && j >= 0) { // up-left
+        moves.push([i][j]);
+        i--;
+        j--;
+    }
+    
+    return moves.filter(coord => (coord[0] < 8 && coord[1] < 8 && coord[0] >= 0 && coord[1] >= 0))
+}
+
+var generatePossibleQueenMoves = (y, x) => {
+    return [...generatePossibleRookMoves(y, x), ...generatePossibleBishopMoves(y, x)];
 }
 
 var generatePossibleKnightMoves = (y, x) => {
