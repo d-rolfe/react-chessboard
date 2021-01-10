@@ -129,7 +129,7 @@ export const ChessGame = {
 // helper functions
 
 var getPossibleMoves = (piece, y, x, board) => {
-    switch(piece) {
+    switch(piece.type) {
         case "pawn":
             return generatePossiblePawnMoves(piece, board, y, x);
         case "knight":
@@ -158,6 +158,7 @@ var computeCheckMate = (G) => {
                 if (piece !== null &&  piece.team === "white") {
                     let possibleMoves = getPossibleMoves(piece, i, j, G.board)
                     for (let move of possibleMoves) {
+                        console.log('possible move: [' + move[0] + ', ' + move[1]);
                         // create futureBoard with new move
                         if (isValidMove("0", G.board, piece, G.board[move[0]][move[1]], i, j, move[0], move[1])) {
                             let futureBoard = []
@@ -180,13 +181,17 @@ var computeCheckMate = (G) => {
     }
     else if (G.isCheck.blackKingIsInCheck === true) {
         // can black make any move to get out of check?
-        for (let i = 0; i < G.board; i++) {
+        console.log('can black make any move to get out of check?');
+        for (let i = 0; i < G.board.length; i++) {
             let row = G.board[i];
             for (let j = 0; j < row.length; j++) {
                 let piece = row[j];
-                if (piece !== null &&  piece.team === "black") {
+                if (piece !== null && piece.team === "black") {
                     let possibleMoves = getPossibleMoves(piece, i, j, G.board)
+                    console.log('possible moves:');
+                    console.log(possibleMoves);
                     for (let move of possibleMoves) {
+                        console.log('possible move: [' + move[0] + ', ' + move[1]);
                         // create futureBoard with new move
                         if (isValidMove("1", G.board, piece, G.board[move[0]][move[1]], i, j, move[0], move[1])) {
                             let futureBoard = []
@@ -403,14 +408,14 @@ var generatePossiblePawnMoves = (piece, board, y, x) => {
     if (piece.team === "white") {
         if (y === "6" && board[y - 2][x] === null) moves.push([y - 2, x]);
         if (board[y - 1][x] === null) moves.push([y - 1, x]);
-        if (board[y - 1][x - 1] !== null && board[y - 1][x - 1].team !== piece.team) moves.push([y - 1, x - 1]);
-        if (board[y - 1][x + 1] !== null && board[y - 1][x + 1].team !== piece.team) moves.push([y - 1, x + 1]);
+        if (board[y - 1][x - 1] && board[y - 1][x - 1] !== null && board[y - 1][x - 1].team !== piece.team) moves.push([y - 1, x - 1]);
+        if (board[y - 1][x + 1] && board[y - 1][x + 1] !== null && board[y - 1][x + 1].team !== piece.team) moves.push([y - 1, x + 1]);
     }
     else if (piece.team === "black") {
         if (y === "1" && board[y + 2][x] === null) moves.push([y + 2, x]);
         if (board[y + 1][x] === null) moves.push([y + 1, x]);
-        if (board[y + 1][x - 1] !== null && board[y + 1][x - 1].team !== piece.team) moves.push([y + 1, x - 1]);
-        if (board[y + 1][x + 1] !== null && board[y + 1][x + 1].team !== piece.team) moves.push([y + 1, x + 1]);
+        if (board[y + 1][x - 1] && board[y + 1][x - 1] !== null && board[y + 1][x - 1].team !== piece.team) moves.push([y + 1, x - 1]);
+        if (board[y + 1][x + 1] && board[y + 1][x + 1] !== null && board[y + 1][x + 1].team !== piece.team) moves.push([y + 1, x + 1]);
     }
 
     return moves.filter(coord => (coord[0] < 8 && coord[1] < 8 && coord[0] >= 0 && coord[1] >= 0))
@@ -419,10 +424,10 @@ var generatePossiblePawnMoves = (piece, board, y, x) => {
 var generatePossibleRookMoves = (y, x) => {
     let moves = [];
     for (let i = 0; i < 8; i++) {
-        moves.push([i][x]);
+        moves.push([i, x]);
     }
     for (let j = 0; j < 8; j++) {
-        moves.push([y][j]);
+        moves.push([y, j]);
     }
     return moves.filter(coord => (coord[0] < 8 && coord[1] < 8 && coord[0] >= 0 && coord[1] >= 0))
 }
@@ -433,7 +438,7 @@ var generatePossibleBishopMoves = (y, x) => {
     let i = y; 
     let j = x;
     while (i < 8 && j < 8) { // down-right 
-        moves.push([i][j]);
+        moves.push([i, j]);
         i++;
         j++;
     }
@@ -441,7 +446,7 @@ var generatePossibleBishopMoves = (y, x) => {
     i = y;
     j = x;
     while (i >= 0 && j < 8) { // up-right
-        moves.push([i][j]);
+        moves.push([i, j]);
         i--;
         j++;
     }
@@ -449,7 +454,7 @@ var generatePossibleBishopMoves = (y, x) => {
     i = y;
     j = x;
     while (i < 8 && j >= 0) { // down-left
-        moves.push([i][j]);
+        moves.push([i, j]);
         i++;
         j--;
     }
@@ -457,7 +462,7 @@ var generatePossibleBishopMoves = (y, x) => {
     i = y;
     j = x;
     while (i >= 0 && j >= 0) { // up-left
-        moves.push([i][j]);
+        moves.push([i, j]);
         i--;
         j--;
     }
