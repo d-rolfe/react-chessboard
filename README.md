@@ -1,4 +1,23 @@
-# Getting Started with Create React App
+# React Chessboard
+This is a game of chess built with ReactJS and boardgame.io library.
+- To play, just run `npm start`
+- If your King is in check, you will see a message at the top of the screen
+- invalid moves/moves that put your king in check will not be allowed
+- If checkmate, the game will end
+- White player starts first (white = player "0", black = player "1")
+- the debug panel on the right shows which players turn it is (0 or 1)
+
+Features to add:
+- add a 'concede/reset game button'
+- add ability to play against AI opponent
+- add ability for 2 players to connect to app remotely to play
+- add UI component to keep track of captured pieces for each team
+- add rule for 'castling' rook and king
+- add rule for pawn reaching other end of board
+
+
+
+## Getting Started with Create React App
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 

@@ -45,10 +45,10 @@ export class ChessBoard extends React.Component {
                 <table>
                     <tbody>{board}</tbody>
                 </table>
-                <p>{'Using fromCharCode (decimal): ' + String.fromCharCode(9812) }</p>
+                {/* <p>{'Using fromCharCode (decimal): ' + String.fromCharCode(9812) }</p>
                 <p>{'Using fromCharCode (hex): ' + String.fromCharCode(0x2654) }</p>
                 <p>{'Using fromCodePoint (decimal): ' + String.fromCharCode(9812) }</p>
-                <p>{'Using fromCodePoint (hex): ' + String.fromCharCode(0x2654) }</p>
+                <p>{'Using fromCodePoint (hex): ' + String.fromCharCode(0x2654) }</p> */}
             </div>
         )
     }
